@@ -29,8 +29,9 @@
             </NuxtLink>
           </div>
           
-          <!-- Mobile Menu Button -->
+          <!-- Mobile Menu Button - Only show if there are menu items -->
           <button 
+            v-if="siteStore.info?.menu && siteStore.info.menu.length > 0"
             @click="siteStore.toggleMenu"
             class="md:hidden brutalist-button text-sm p-2 min-w-[60px] touch-manipulation"
             :aria-expanded="siteStore.menuIsActive"
