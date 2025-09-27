@@ -1,47 +1,108 @@
-# Bael Netlify CMS Template
+# Tia Ashley Kushniruk Portfolio
 
-![Bael](https://i.imgur.com/e1zmiB2.jpg "Bael CMS Blog Template")
+A modern, brutalist portfolio website built with Nuxt 3, TypeScript, and Tailwind CSS.
 
-> Bael is a free template that gives you an easy way to start a blog that uses modern technologies like static-site JAMstack architecture, CSS grid layout, responsive design, and fuzzy search — all wrapped up in a brutalist aesthetic.
+## Features
 
-## Info
+- **Modern Stack**: Nuxt 3, Vue 3, TypeScript, Tailwind CSS
+- **Content Management**: Decap CMS (formerly Netlify CMS) for easy content editing
+- **Performance**: Optimized builds with Vite
+- **Responsive**: Mobile-first design with brutalist aesthetics
+- **SEO Optimized**: Meta tags, structured data, and sitemap generation
+- **Accessibility**: WCAG compliant design patterns
 
-Bael runs using [Nuxt.js](https://nuxtjs.org), [Vue.js](https://vuejs.org), [Netlify CMS](https://netlifycms.org), and is hosted by [Netlify](https://netlify.com). Bael requires an account with Netlify and Github/Bitbucket to deploy. Made by [Jake 101](https://jake101.com)
+## Tech Stack
 
-## Deploy to Netlify
+- **Framework**: Nuxt 3
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Content**: Nuxt Content
+- **State Management**: Pinia
+- **CMS**: Decap CMS
+- **Deployment**: Netlify
 
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/jake-101/bael-template)
+## Development
 
+### Prerequisites
 
-## Build Setup
+- Node.js 18+ 
+- npm or yarn
 
-``` bash
-# install dependencies
-$ npm install # Or yarn install
+### Setup
 
-# serve with hot reload at localhost:3000
-$ npm run dev
-
-# build for production and launch server
-$ npm run build
-$ npm start
-
-# generate static project
-$ npm run generate
+1. Install dependencies:
+```bash
+npm install
 ```
 
-## Edit content
+2. Start development server:
+```bash
+npm run dev
+```
 
-Access `yourwebsite.com/admin`, e.g. `localhost:3000/admin`.
+3. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-## Manage dynamic routes
+### Build for Production
 
-When you use Netlify CMS' `folder` type, you actually create dynamic routes. For example, when creating a blog,
-you render different content files with the same template. And for the blog to know which content to render,
-it looks at the url and gets the specific content file. That's a dynamic route.
+```bash
+npm run generate
+```
 
-So If you create a `folder` type with Netlify CMS, add the folder as glob to the `dynamicRoutes` variable
-in the `nuxt.config.js`.
+The static files will be generated in the `dist/` directory.
 
-MIT License
+## Content Management
 
+Access the admin panel at `/admin` to manage content:
+
+- **Blog Posts**: Create and edit blog posts with markdown
+- **Pages**: Create static pages
+- **Site Settings**: Configure site information, menu, and social links
+- **Categories**: Manage blog categories and subcategories
+
+## Deployment
+
+This site is configured for Netlify deployment:
+
+1. Connect your repository to Netlify
+2. Set build command: `npm run generate`
+3. Set publish directory: `dist`
+4. Deploy!
+
+## Project Structure
+
+```
+├── assets/           # Global styles and assets
+├── components/       # Vue components
+├── content/          # Markdown content files
+├── layouts/          # Page layouts
+├── pages/           # File-based routing
+├── public/          # Static assets
+├── server/          # API routes
+├── stores/          # Pinia stores
+└── nuxt.config.ts   # Nuxt configuration
+```
+
+## Content Structure
+
+- `content/blog/` - Blog posts (markdown)
+- `content/page/` - Static pages (markdown)
+- `content/setup/` - Site configuration (JSON)
+- `content/subcategory/` - Blog subcategories (JSON)
+- `content/category/` - Blog categories (JSON)
+
+## Customization
+
+### Styling
+
+The site uses Tailwind CSS with custom brutalist components. Edit `assets/css/main.css` and `tailwind.config.js` to customize the design.
+
+### Content Types
+
+Add new content types by:
+1. Creating new folders in `content/`
+2. Adding corresponding collections in `public/admin/config.yml`
+3. Creating page components in `pages/`
+
+## License
+
+MIT License - see LICENSE file for details.

@@ -1,0 +1,57 @@
+name: Update Content Cache
+
+on:
+  push:
+    paths:
+      - 'content/blog/**/*.md'
+      - 'content/setup/**/*.json'
+      - 'content/subcategory/**/*.json'
+      - 'content/category/**/*.json'
+    branches:
+      - main
+      - master
+
+jobs:
+  update-content:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Update content cache
+      run: npm run update-content
+      
+    - name: Check for changes
+      id: verify-changed-files
+      run: |
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "changed=true" >> $GITHUB_OUTPUT
+        else
+          echo "changed=false" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Commit and push changes
+      if: steps.verify-changed-files.outputs.changed == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add public/content-cache.json
+        git commit -m "Auto-update content cache - triggered by: ${{ github.event.head_commit.message }}"
+        
+        echo "Pushing changes to trigger Netlify deployment..."
+        git push
+        
+        echo "✅ Content cache updated and pushed successfully"
+        echo "📦 Netlify should now trigger a new deployment"

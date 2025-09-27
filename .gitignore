@@ -9,8 +9,9 @@ npm-debug.log
 
 # Nuxt generate
 dist
+.output
 
-# Nuxt generate
+# Service worker
 sw.*
 sw.js
 
