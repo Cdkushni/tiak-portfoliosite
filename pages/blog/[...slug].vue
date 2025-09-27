@@ -102,11 +102,11 @@
               </div>
               
               <!-- Previous/Next Navigation -->
-              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div v-if="previousPost" class="flex-1 min-w-0">
+              <div class="flex flex-col sm:flex-row justify-center sm:justify-between items-center gap-4">
+                <div v-if="previousPost" class="w-full sm:flex-1 min-w-0">
                   <NuxtLink 
                     :to="previousPost._path" 
-                    class="group flex items-center gap-2 text-gray-600 hover:text-black transition-colors"
+                    class="group flex items-center gap-2 text-gray-600 hover:text-black transition-colors sm:justify-start"
                   >
                     <svg class="w-4 h-4 transform group-hover:-translate-x-1 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
@@ -118,7 +118,7 @@
                   </NuxtLink>
                 </div>
                 
-                <div v-if="nextPost" class="flex-1 min-w-0 sm:text-right">
+                <div v-if="nextPost" class="w-full sm:flex-1 min-w-0 sm:text-right">
                   <NuxtLink 
                     :to="nextPost._path" 
                     class="group flex items-center gap-2 text-gray-600 hover:text-black transition-colors sm:justify-end"
