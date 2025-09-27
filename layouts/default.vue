@@ -1,7 +1,15 @@
 <template>
   <div class="min-h-screen bg-white">
+    <!-- Skip Navigation -->
+    <a 
+      href="#main-content" 
+      class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 brutalist-button text-sm"
+    >
+      Skip to main content
+    </a>
+    
     <!-- Header -->
-    <header class="sticky top-0 z-50 bg-white brutalist-border-b-4">
+    <header class="sticky top-0 z-40 bg-white brutalist-border-b-4">
       <nav class="container mx-auto px-4 py-4">
         <div class="flex items-center justify-between">
           <!-- Logo -->
@@ -24,16 +32,23 @@
           <!-- Mobile Menu Button -->
           <button 
             @click="siteStore.toggleMenu"
-            class="md:hidden brutalist-button text-sm"
+            class="md:hidden brutalist-button text-sm p-2 min-w-[60px] touch-manipulation"
+            :aria-expanded="siteStore.menuIsActive"
+            aria-controls="mobile-menu"
+            aria-label="Toggle navigation menu"
           >
-            Menu
+            <span v-if="!siteStore.menuIsActive">Menu</span>
+            <span v-else>Close</span>
           </button>
         </div>
         
         <!-- Mobile Menu -->
         <div 
           v-if="siteStore.menuIsActive" 
+          id="mobile-menu"
           class="md:hidden mt-4 pb-4 brutalist-border-b-4"
+          role="navigation"
+          aria-label="Mobile navigation"
         >
           <NuxtLink 
             v-for="item in siteStore.info?.menu" 
@@ -49,9 +64,12 @@
     </header>
 
     <!-- Main Content -->
-    <main>
+    <main id="main-content" role="main">
       <slot />
     </main>
+
+    <!-- Back to Top Button -->
+    <BackToTop />
 
     <!-- Footer -->
     <footer class="bg-black text-white py-12">

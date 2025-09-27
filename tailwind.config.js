@@ -30,13 +30,21 @@ export default {
           }
         }
       },
-      spacing: {
-        '18': '4.5rem',
-        '88': '22rem',
-      },
-      borderWidth: {
-        '4': '4px',
-      }
+          spacing: {
+            '18': '4.5rem',
+            '88': '22rem',
+          },
+          borderWidth: {
+            '4': '4px',
+          },
+          lineClamp: {
+            1: '1',
+            2: '2',
+            3: '3',
+            4: '4',
+            5: '5',
+            6: '6',
+          }
     },
   },
   plugins: [
@@ -80,10 +88,52 @@ export default {
           'grid-template-columns': 'repeat(auto-fit, minmax(300px, 1fr))',
           gap: '2rem',
         },
-        '.text-brutalist': {
-          'font-weight': '800',
-          'letter-spacing': '-0.02em',
-        },
+            '.text-brutalist': {
+              'font-weight': '800',
+              'letter-spacing': '-0.02em',
+            },
+            '.line-clamp-1': {
+              'display': '-webkit-box',
+              '-webkit-line-clamp': '1',
+              '-webkit-box-orient': 'vertical',
+              'overflow': 'hidden',
+            },
+            '.line-clamp-2': {
+              'display': '-webkit-box',
+              '-webkit-line-clamp': '2',
+              '-webkit-box-orient': 'vertical',
+              'overflow': 'hidden',
+            },
+            '.line-clamp-3': {
+              'display': '-webkit-box',
+              '-webkit-line-clamp': '3',
+              '-webkit-box-orient': 'vertical',
+              'overflow': 'hidden',
+            },
+            '.sr-only': {
+              'position': 'absolute',
+              'width': '1px',
+              'height': '1px',
+              'padding': '0',
+              'margin': '-1px',
+              'overflow': 'hidden',
+              'clip': 'rect(0, 0, 0, 0)',
+              'white-space': 'nowrap',
+              'border': '0',
+            },
+            '.focus\\:not-sr-only:focus': {
+              'position': 'static',
+              'width': 'auto',
+              'height': 'auto',
+              'padding': 'inherit',
+              'margin': 'inherit',
+              'overflow': 'visible',
+              'clip': 'auto',
+              'white-space': 'normal',
+            },
+            '.touch-manipulation': {
+              'touch-action': 'manipulation',
+            },
       }
       addUtilities(newUtilities)
     }

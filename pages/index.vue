@@ -3,11 +3,11 @@
     <!-- Hero Section -->
     <section class="py-16 md:py-24">
       <div class="container mx-auto px-4">
-        <div class="max-w-4xl mx-auto text-center">
-          <h1 class="text-4xl md:text-6xl font-bold text-brutalist-black mb-6">
+        <div class="max-w-4xl mx-auto text-center px-4">
+          <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-brutalist-black mb-6 leading-tight">
             {{ siteStore.info?.sitename || 'Tia Ashley Kushniruk' }}
           </h1>
-          <p class="text-xl md:text-2xl text-gray-600 mb-8">
+          <p class="text-lg sm:text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
             {{ siteStore.info?.sitedescription || 'The Brutalist Home of Tia Ashley Kushniruk.' }}
           </p>
         </div>
@@ -31,7 +31,7 @@
           <article 
             v-for="post in posts" 
             :key="post._path"
-            class="brutalist-card group hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all duration-200"
+            class="brutalist-card group hover:translate-x-2 hover:translate-y-2 hover:shadow-none transition-all duration-300 cursor-pointer"
           >
             <!-- Featured Image -->
             <div v-if="post.thumbnail" class="mb-4">
@@ -46,7 +46,7 @@
             
             <!-- Content -->
             <div>
-              <h3 class="text-xl font-bold mb-2 group-hover:text-gray-600 transition-colors">
+              <h3 class="text-lg sm:text-xl font-bold mb-2 group-hover:text-gray-600 transition-colors leading-tight">
                 <NuxtLink :to="post._path" class="hover:underline">
                   {{ post.title }}
                 </NuxtLink>
@@ -61,7 +61,7 @@
                 </span>
               </div>
               
-              <p v-if="post.description" class="text-gray-700 mb-4">
+              <p v-if="post.description" class="text-gray-700 mb-4 line-clamp-3">
                 {{ post.description }}
               </p>
               

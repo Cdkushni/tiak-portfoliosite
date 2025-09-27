@@ -24,16 +24,22 @@
       
       <!-- Post Header -->
       <header class="mb-8">
-        <h1 class="text-4xl md:text-5xl font-bold text-brutalist-black mb-4">
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-brutalist-black mb-4 leading-tight">
           {{ post.title }}
         </h1>
         
-        <div class="flex items-center gap-4 mb-6 text-gray-600">
+        <div class="flex items-center gap-4 mb-6 text-gray-600 flex-wrap">
           <time :datetime="post.date" class="text-lg">
             {{ formatDate(post.date) }}
           </time>
           <span v-if="post.subcategory" class="bg-black text-white px-3 py-1 text-sm font-bold uppercase">
             {{ post.subcategory }}
+          </span>
+          <span class="flex items-center gap-1 text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            {{ readingTime }} min read
           </span>
         </div>
       </header>
@@ -43,25 +49,97 @@
         <ContentRenderer :value="post" />
       </div>
       
+      <!-- Related Posts -->
+      <section v-if="relatedPosts.length > 0" class="mt-12 pt-8 border-t border-gray-200">
+        <h3 class="text-2xl font-bold mb-6">Related Posts</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <article 
+            v-for="relatedPost in relatedPosts" 
+            :key="relatedPost._path"
+            class="brutalist-card group hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all duration-200"
+          >
+            <div v-if="relatedPost.thumbnail" class="mb-4">
+              <img 
+                :src="getImagePath(relatedPost.thumbnail)" 
+                :alt="relatedPost.title"
+                class="w-full h-32 object-cover brutalist-border"
+                loading="lazy"
+                @error="handleImageError"
+              />
+            </div>
+            <div>
+              <h4 class="font-bold mb-2 group-hover:text-gray-600 transition-colors">
+                <NuxtLink :to="relatedPost._path" class="hover:underline">
+                  {{ relatedPost.title }}
+                </NuxtLink>
+              </h4>
+              <p v-if="relatedPost.description" class="text-sm text-gray-600 mb-3">
+                {{ relatedPost.description }}
+              </p>
+              <NuxtLink 
+                :to="relatedPost._path" 
+                class="inline-block brutalist-button text-xs"
+              >
+                Read More
+              </NuxtLink>
+            </div>
+          </article>
+        </div>
+      </section>
+
       <!-- Navigation -->
       <nav class="mt-12 pt-8 border-t border-gray-200">
-        <div class="flex justify-between items-center">
-          <NuxtLink 
-            to="/" 
-            class="brutalist-button"
-          >
-            ← Back to Home
-          </NuxtLink>
-          
-          <div class="flex gap-4">
-            <button 
-              @click="sharePost"
-              class="brutalist-button hover:bg-gray-800 transition-colors"
-              :disabled="!post || isSharing"
+        <!-- Previous/Next Navigation -->
+        <div class="flex justify-between items-center mb-6">
+          <div v-if="previousPost" class="flex-1">
+            <NuxtLink 
+              :to="previousPost._path" 
+              class="group flex items-center gap-2 text-gray-600 hover:text-black transition-colors"
             >
-              {{ isSharing ? 'Sharing...' : 'Share' }}
-            </button>
+              <svg class="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+              <div>
+                <div class="text-sm text-gray-500">Previous</div>
+                <div class="font-semibold">{{ previousPost.title }}</div>
+              </div>
+            </NuxtLink>
           </div>
+          
+          <div class="flex-1 text-center">
+            <NuxtLink 
+              to="/" 
+              class="brutalist-button text-sm"
+            >
+              ← All Posts
+            </NuxtLink>
+          </div>
+          
+          <div v-if="nextPost" class="flex-1 text-right">
+            <NuxtLink 
+              :to="nextPost._path" 
+              class="group flex items-center justify-end gap-2 text-gray-600 hover:text-black transition-colors"
+            >
+              <div>
+                <div class="text-sm text-gray-500">Next</div>
+                <div class="font-semibold">{{ nextPost.title }}</div>
+              </div>
+              <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </NuxtLink>
+          </div>
+        </div>
+        
+        <!-- Share Button -->
+        <div class="text-center">
+          <button 
+            @click="sharePost"
+            class="brutalist-button hover:bg-gray-800 transition-colors"
+            :disabled="!post || isSharing"
+          >
+            {{ isSharing ? 'Sharing...' : 'Share This Post' }}
+          </button>
         </div>
       </nav>
     </article>
@@ -176,8 +254,8 @@ const isSharing = ref(false)
 const shareMessage = ref('')
 const showShareSheet = ref(false)
 
-// Fetch the blog post
-const { data: post, pending, error } = await useAsyncData(`blog-${route.params.slug}`, async () => {
+// Fetch the blog post with navigation and related posts
+const { data: postData, pending, error } = await useAsyncData(`blog-${route.params.slug}`, async () => {
   try {
     // Get all blog posts from the static content cache
     let contentCache
@@ -192,19 +270,55 @@ const { data: post, pending, error } = await useAsyncData(`blog-${route.params.s
       })
     }
     
+    // Filter for blog posts and sort by filename
+    const blogPosts = contentCache
+      .filter((item: any) => item._path?.startsWith('/blog/'))
+      .sort((a: any, b: any) => b._path.localeCompare(a._path))
+    
     // Find the specific post by path
-    const foundPost = contentCache.find((item: any) => 
+    const currentIndex = blogPosts.findIndex((item: any) => 
       item._path === `/blog/${route.params.slug}`
     )
     
-    if (!foundPost) {
+    if (currentIndex === -1) {
       throw createError({
         statusCode: 404,
         statusMessage: 'Post not found'
       })
     }
     
-    return foundPost
+    const currentPost = blogPosts[currentIndex]
+    
+    // Get previous and next posts
+    const previousPost = currentIndex < blogPosts.length - 1 ? blogPosts[currentIndex + 1] : null
+    const nextPost = currentIndex > 0 ? blogPosts[currentIndex - 1] : null
+    
+    // Get related posts (same category, excluding current post)
+    const relatedPosts = blogPosts
+      .filter((post: any) => 
+        post._path !== currentPost._path && 
+        post.subcategory === currentPost.subcategory
+      )
+      .slice(0, 3)
+    
+    // Calculate reading time (average 200 words per minute)
+    const wordCount = currentPost.body?.children
+      ?.map((child: any) => {
+        if (child.type === 'text') return child.value.split(' ').length
+        if (child.children) return child.children.map((c: any) => c.value?.split(' ').length || 0).reduce((a: number, b: number) => a + b, 0)
+        return 0
+      })
+      .reduce((a: number, b: number) => a + b, 0) || 0
+    
+    const readingTime = Math.max(1, Math.ceil(wordCount / 200))
+    
+    return {
+      post: currentPost,
+      previousPost,
+      nextPost,
+      relatedPosts,
+      readingTime
+    }
   } catch (err) {
     console.error('Error fetching blog post:', err)
     throw createError({
@@ -213,6 +327,13 @@ const { data: post, pending, error } = await useAsyncData(`blog-${route.params.s
     })
   }
 })
+
+// Extract post from the data
+const post = computed(() => postData.value?.post)
+const previousPost = computed(() => postData.value?.previousPost)
+const nextPost = computed(() => postData.value?.nextPost)
+const relatedPosts = computed(() => postData.value?.relatedPosts || [])
+const readingTime = computed(() => postData.value?.readingTime || 1)
 
 // Format date helper
 const formatDate = (date: string) => {
