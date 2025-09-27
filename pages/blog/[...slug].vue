@@ -49,9 +49,9 @@
         <ContentRenderer :value="post" />
       </div>
       
-      <!-- Related Posts -->
+      <!-- More Posts -->
       <section v-if="relatedPosts.length > 0" class="mt-12 pt-8 border-t border-gray-200">
-        <h3 class="text-2xl font-bold mb-6">Related Posts</h3>
+        <h3 class="text-2xl font-bold mb-6">More Posts</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <article 
             v-for="relatedPost in relatedPosts" 
@@ -89,47 +89,51 @@
 
       <!-- Navigation -->
       <nav class="mt-12 pt-8 border-t border-gray-200">
-        <!-- Previous/Next Navigation -->
-        <div class="flex justify-between items-center mb-6">
-          <div v-if="previousPost" class="flex-1">
-            <NuxtLink 
-              :to="previousPost._path" 
-              class="group flex items-center gap-2 text-gray-600 hover:text-black transition-colors"
-            >
-              <svg class="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-              </svg>
-              <div>
-                <div class="text-sm text-gray-500">Previous</div>
-                <div class="font-semibold">{{ previousPost.title }}</div>
+            <!-- Previous/Next Navigation -->
+            <div class="space-y-4 mb-6">
+              <!-- All Posts Button - Full width on mobile -->
+              <div class="text-center">
+                <NuxtLink 
+                  to="/" 
+                  class="brutalist-button text-sm w-full sm:w-auto inline-block"
+                >
+                  ← All Posts
+                </NuxtLink>
               </div>
-            </NuxtLink>
-          </div>
-          
-          <div class="flex-1 text-center">
-            <NuxtLink 
-              to="/" 
-              class="brutalist-button text-sm"
-            >
-              ← All Posts
-            </NuxtLink>
-          </div>
-          
-          <div v-if="nextPost" class="flex-1 text-right">
-            <NuxtLink 
-              :to="nextPost._path" 
-              class="group flex items-center justify-end gap-2 text-gray-600 hover:text-black transition-colors"
-            >
-              <div>
-                <div class="text-sm text-gray-500">Next</div>
-                <div class="font-semibold">{{ nextPost.title }}</div>
+              
+              <!-- Previous/Next Navigation -->
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div v-if="previousPost" class="flex-1 min-w-0">
+                  <NuxtLink 
+                    :to="previousPost._path" 
+                    class="group flex items-center gap-2 text-gray-600 hover:text-black transition-colors"
+                  >
+                    <svg class="w-4 h-4 transform group-hover:-translate-x-1 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    <div class="min-w-0">
+                      <div class="text-sm text-gray-500">Previous</div>
+                      <div class="font-semibold truncate">{{ previousPost.title }}</div>
+                    </div>
+                  </NuxtLink>
+                </div>
+                
+                <div v-if="nextPost" class="flex-1 min-w-0 sm:text-right">
+                  <NuxtLink 
+                    :to="nextPost._path" 
+                    class="group flex items-center gap-2 text-gray-600 hover:text-black transition-colors sm:justify-end"
+                  >
+                    <div class="min-w-0">
+                      <div class="text-sm text-gray-500">Next</div>
+                      <div class="font-semibold truncate">{{ nextPost.title }}</div>
+                    </div>
+                    <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                  </NuxtLink>
+                </div>
               </div>
-              <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-              </svg>
-            </NuxtLink>
-          </div>
-        </div>
+            </div>
         
         <!-- Share Button -->
         <div class="text-center">
