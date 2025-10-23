@@ -89,7 +89,7 @@
               <a 
                 v-for="link in siteStore.connectLinks" 
                 :key="link.name"
-                :href="link.url" 
+                :href="link.url.startsWith('mailto:') || link.url.startsWith('tel:') || link.url.startsWith('http') ? link.url : (link.url.startsWith('+') || /^\d/.test(link.url) ? `tel:${link.url}` : link.url)" 
                 :target="link.url.startsWith('http') ? '_blank' : undefined"
                 :rel="link.url.startsWith('http') ? 'noopener noreferrer' : undefined"
                 class="group flex items-center gap-3 p-3 bg-gray-900 border-2 border-white hover:bg-white hover:text-black transition-all duration-300 shadow-[4px_4px_0px_0px_rgba(255,255,255,0.3)] hover:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.5)] hover:translate-x-0.5 hover:translate-y-0.5"
