@@ -258,52 +258,37 @@ const isSharing = ref(false)
 const shareMessage = ref('')
 const showShareSheet = ref(false)
 
-// Fetch the blog post with navigation and related posts
+// Fetch the blog post with navigation and related posts using Nuxt Content
 const { data: postData, pending, error } = await useAsyncData(`blog-${route.params.slug}`, async () => {
   try {
-    // Get all blog posts from the static content cache
-    let contentCache
-    try {
-      const response = await $fetch('/content-cache.json')
-      contentCache = response.contents || response
-    } catch (err) {
-      console.error('Error fetching content cache:', err)
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Content not found'
-      })
-    }
+    // Get the slug (handle both string and array)
+    const slug = Array.isArray(route.params.slug) ? route.params.slug.join('/') : route.params.slug
     
-    // Filter for blog posts and sort by filename
-    const blogPosts = contentCache
-      .filter((item: any) => item._path?.startsWith('/blog/'))
-      .sort((a: any, b: any) => b._path.localeCompare(a._path))
+    // Get the current post by path
+    const currentPost = await queryContent('blog')
+      .where({ _path: `/blog/${slug}` })
+      .findOne()
     
-    // Find the specific post by path
-    const currentIndex = blogPosts.findIndex((item: any) => 
-      item._path === `/blog/${route.params.slug}`
-    )
-    
-    if (currentIndex === -1) {
+    if (!currentPost) {
       throw createError({
         statusCode: 404,
         statusMessage: 'Post not found'
       })
     }
     
-    const currentPost = blogPosts[currentIndex]
+    // Get all blog posts sorted by path
+    const allPosts = await queryContent('blog').sort({ _path: -1 }).find()
+    const currentIndex = allPosts.findIndex((p: any) => p._path === currentPost._path)
     
     // Get previous and next posts
-    const previousPost = currentIndex < blogPosts.length - 1 ? blogPosts[currentIndex + 1] : null
-    const nextPost = currentIndex > 0 ? blogPosts[currentIndex - 1] : null
+    const previousPost = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null
+    const nextPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null
     
     // Get related posts (same category, excluding current post)
-    const relatedPosts = blogPosts
-      .filter((post: any) => 
-        post._path !== currentPost._path && 
-        post.subcategory === currentPost.subcategory
-      )
-      .slice(0, 3)
+    const relatedPosts = await queryContent('blog')
+      .where({ subcategory: currentPost.subcategory, _path: { $ne: currentPost._path } })
+      .limit(3)
+      .find()
     
     // Calculate reading time (average 200 words per minute)
     const wordCount = currentPost.body?.children

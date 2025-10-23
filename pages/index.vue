@@ -107,29 +107,13 @@
 <script setup lang="ts">
 const siteStore = useSiteStore()
 
-// Fetch blog posts
-const { data: posts, pending, error } = await useAsyncData('blog-posts', async () => {
+// Fetch blog posts using Nuxt Content
+const { data: posts, pending, error} = await useAsyncData('blog-posts', async () => {
   try {
-    // In static builds, we need to fetch the content differently
-    // Get all blog posts from the static content cache
-    let contentCache
-    try {
-      const response = await $fetch('/content-cache.json')
-      contentCache = response.contents || response
-    } catch (err) {
-      console.error('Error fetching content cache:', err)
-      return []
-    }
-    
-        // Filter for blog posts and sort by filename (which includes date)
-        // This is more reliable than parsing various date formats
-        const blogPosts = contentCache
-          .filter((item: any) => item._path?.startsWith('/blog/'))
-          .sort((a: any, b: any) => {
-            // Use filename-based sorting (which includes date) as primary method
-            return b._path.localeCompare(a._path)
-          })
-          .slice(0, 12)
+    const blogPosts = await queryContent('blog')
+      .sort({ _path: -1 })
+      .limit(12)
+      .find()
     
     return blogPosts
   } catch (err) {

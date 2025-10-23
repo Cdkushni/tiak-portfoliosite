@@ -85,18 +85,53 @@
           <!-- Connect Links -->
           <div v-if="siteStore.connectLinks.length > 0">
             <h3 class="text-xl font-bold mb-4">Connect</h3>
-            <ul class="space-y-2">
-              <li v-for="link in siteStore.connectLinks" :key="link.name">
-                <a 
-                  :href="link.url" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  class="text-gray-300 hover:text-white transition-colors"
-                >
-                  {{ link.name }}
-                </a>
-              </li>
-            </ul>
+            <div class="space-y-3">
+              <a 
+                v-for="link in siteStore.connectLinks" 
+                :key="link.name"
+                :href="link.url" 
+                :target="link.url.startsWith('http') ? '_blank' : undefined"
+                :rel="link.url.startsWith('http') ? 'noopener noreferrer' : undefined"
+                class="group flex items-center gap-3 p-3 bg-gray-900 border-2 border-white hover:bg-white hover:text-black transition-all duration-300 shadow-[4px_4px_0px_0px_rgba(255,255,255,0.3)] hover:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.5)] hover:translate-x-0.5 hover:translate-y-0.5"
+              >
+                <!-- Icon based on link type -->
+                <span class="flex-shrink-0 w-6 h-6">
+                  <!-- Email Icon -->
+                  <svg v-if="link.url.startsWith('mailto:')" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                  </svg>
+                  <!-- Phone Icon -->
+                  <svg v-else-if="link.url.startsWith('tel:') || link.url.startsWith('+') || link.name.toLowerCase().includes('phone')" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                  </svg>
+                  <!-- Generic Link Icon -->
+                  <svg v-else class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
+                  </svg>
+                </span>
+                
+                <!-- Link Text with Arrow -->
+                <span class="flex-1 font-semibold">
+                  <span v-if="link.url.startsWith('mailto:')">
+                    {{ link.url.replace('mailto:', '') }}
+                  </span>
+                  <span v-else-if="link.url.startsWith('tel:')">
+                    {{ link.url.replace('tel:', '') }}
+                  </span>
+                  <span v-else-if="link.url.startsWith('+') || /^\d/.test(link.url)">
+                    {{ link.url }}
+                  </span>
+                  <span v-else>
+                    {{ link.name }}
+                  </span>
+                </span>
+                
+                <!-- Arrow Icon -->
+                <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                </svg>
+              </a>
+            </div>
           </div>
           
           <!-- Categories -->
@@ -126,31 +161,11 @@
 <script setup lang="ts">
 const siteStore = useSiteStore()
 
-// Fetch site data at build time
+// Fetch site data from API
 const { data: siteData } = await useAsyncData('site-data', async () => {
   try {
-    // Read JSON files directly as static assets
-    const infoData = await $fetch('/content/setup/info.json')
-    const connectData = await $fetch('/content/setup/connect.json')
-    
-    // Read subcategory files
-    const subcategoryFiles = ['film.json', 'research-other.json', 'touring.json']
-    const subcategoriesData = await Promise.all(
-      subcategoryFiles.map(async (file) => {
-        try {
-          return await $fetch(`/content/subcategory/${file}`)
-        } catch {
-          return null
-        }
-      })
-    ).then(results => results.filter(Boolean))
-    
-    return {
-      info: infoData,
-      connectLinks: connectData?.connectlinks || [],
-      subcategories: subcategoriesData || [],
-      categories: [] // No categories for now
-    }
+    const data = await $fetch('/api/site-info')
+    return data
   } catch (error) {
     console.error('Error fetching site data:', error)
     return {

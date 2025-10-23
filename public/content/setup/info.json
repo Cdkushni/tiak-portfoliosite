@@ -5,6 +5,15 @@
   "showmenu": true,
   "emailsignup": false,
   "altlayout": false,
-  "menu": [],
+  "menu": [
+    {
+      "name": "Home",
+      "link": "/"
+    },
+    {
+      "name": "About",
+      "link": "/about"
+    }
+  ],
   "linkcolor": "#000000"
 }

@@ -52,11 +52,43 @@ The static files will be generated in the `dist/` directory.
 
 ## Content Management
 
-Access the admin panel at `/admin` to manage content:
+### Adding Pages
+
+Pages are automatically discovered and added to the navigation menu!
+
+**Quick Method:**
+```bash
+npm run create-page <page-name> [title]
+```
+
+Example:
+```bash
+npm run create-page contact "Contact Me"
+```
+
+This creates a new page at `content/page/contact.md` that will automatically:
+- Be accessible at `/contact`
+- Appear in the navigation menu as "Contact Me"
+- Be sorted alphabetically with other pages
+
+**Manual Method:**
+1. Create a new markdown file in `content/page/`
+2. Add frontmatter with a `title` field
+3. The page will automatically appear in the menu!
+
+See [PAGES_WORKFLOW.md](PAGES_WORKFLOW.md) for detailed documentation.
+
+### Blog Posts
+
+See [CONTENT_WORKFLOW.md](CONTENT_WORKFLOW.md) for managing blog posts.
+
+### Admin Panel (Optional)
+
+Access the admin panel at `/admin` to manage content through a GUI:
 
 - **Blog Posts**: Create and edit blog posts with markdown
 - **Pages**: Create static pages
-- **Site Settings**: Configure site information, menu, and social links
+- **Site Settings**: Configure site information and social links
 - **Categories**: Manage blog categories and subcategories
 
 ## Deployment
