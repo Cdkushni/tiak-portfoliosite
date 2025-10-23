@@ -258,37 +258,69 @@ const isSharing = ref(false)
 const shareMessage = ref('')
 const showShareSheet = ref(false)
 
-// Fetch the blog post with navigation and related posts using Nuxt Content
+// Fetch the blog post with navigation and related posts - hybrid approach
 const { data: postData, pending, error } = await useAsyncData(`blog-${route.params.slug}`, async () => {
   try {
     // Get the slug (handle both string and array)
     const slug = Array.isArray(route.params.slug) ? route.params.slug.join('/') : route.params.slug
+    const postPath = `/blog/${slug}`
     
-    // Get the current post by path
-    const currentPost = await queryContent('blog')
-      .where({ _path: `/blog/${slug}` })
-      .findOne()
+    let currentPost
+    let allPosts
+    let relatedPosts
     
-    if (!currentPost) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Post not found'
-      })
+    // In dev, use Nuxt Content API
+    if (process.dev) {
+      try {
+        currentPost = await queryContent('blog')
+          .where({ _path: postPath })
+          .findOne()
+        
+        if (currentPost) {
+          allPosts = await queryContent('blog').sort({ _path: -1 }).find()
+          relatedPosts = await queryContent('blog')
+            .where({ subcategory: currentPost.subcategory, _path: { $ne: currentPost._path } })
+            .limit(3)
+            .find()
+        }
+      } catch (err) {
+        console.warn('Nuxt Content query failed, falling back to cache')
+      }
     }
     
-    // Get all blog posts sorted by path
-    const allPosts = await queryContent('blog').sort({ _path: -1 }).find()
-    const currentIndex = allPosts.findIndex((p: any) => p._path === currentPost._path)
+    // If dev query failed or in production, use content cache
+    if (!currentPost) {
+      const response = await $fetch('/content-cache.json')
+      const contentCache = response.contents || response
+      
+      // Get all blog posts sorted
+      allPosts = contentCache
+        .filter((item: any) => item._path?.startsWith('/blog/'))
+        .sort((a: any, b: any) => b._path.localeCompare(a._path))
+      
+      // Find current post
+      currentPost = allPosts.find((item: any) => item._path === postPath)
+      
+      if (!currentPost) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: 'Post not found'
+        })
+      }
+      
+      // Get related posts
+      relatedPosts = allPosts
+        .filter((post: any) => 
+          post._path !== currentPost._path && 
+          post.subcategory === currentPost.subcategory
+        )
+        .slice(0, 3)
+    }
     
     // Get previous and next posts
+    const currentIndex = allPosts.findIndex((p: any) => p._path === currentPost._path)
     const previousPost = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null
     const nextPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null
-    
-    // Get related posts (same category, excluding current post)
-    const relatedPosts = await queryContent('blog')
-      .where({ subcategory: currentPost.subcategory, _path: { $ne: currentPost._path } })
-      .limit(3)
-      .find()
     
     // Calculate reading time (average 200 words per minute)
     const wordCount = currentPost.body?.children

@@ -6,11 +6,32 @@ import { useSiteStore } from '~/stores/site'
 const route = useRoute()
 const siteStore = useSiteStore()
 
-// Fetch the page using Nuxt Content
+// Fetch the page - hybrid approach for dev and production
 const { data: page, pending, error } = await useAsyncData(`page-${route.params.slug}`, async () => {
   try {
     const slug = Array.isArray(route.params.slug) ? route.params.slug.join('/') : route.params.slug
-    const currentPage = await queryContent('page', slug).findOne()
+    const pagePath = `/page/${slug}`
+    
+    let currentPage
+    
+    // In dev, try Nuxt Content API first
+    if (process.dev) {
+      try {
+        currentPage = await queryContent('page')
+          .where({ _path: pagePath })
+          .findOne()
+      } catch (err) {
+        console.warn('Nuxt Content query failed, falling back to cache')
+      }
+    }
+    
+    // If dev query failed or in production, use content cache
+    if (!currentPage) {
+      const response = await $fetch('/content-cache.json')
+      const contentCache = response.contents || response
+      
+      currentPage = contentCache.find((item: any) => item._path === pagePath)
+    }
     
     if (!currentPage) {
       throw createError({

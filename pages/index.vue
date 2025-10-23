@@ -107,13 +107,30 @@
 <script setup lang="ts">
 const siteStore = useSiteStore()
 
-// Fetch blog posts using Nuxt Content
+// Fetch blog posts - use different methods for dev vs production
 const { data: posts, pending, error} = await useAsyncData('blog-posts', async () => {
   try {
-    const blogPosts = await queryContent('blog')
-      .sort({ _path: -1 })
-      .limit(12)
-      .find()
+    // In dev, use Nuxt Content API
+    if (process.dev) {
+      try {
+        const blogPosts = await queryContent('blog')
+          .sort({ _path: -1 })
+          .limit(12)
+          .find()
+        return blogPosts
+      } catch (err) {
+        console.warn('Nuxt Content query failed, falling back to cache')
+      }
+    }
+    
+    // In production, use content cache
+    const response = await $fetch('/content-cache.json')
+    const contentCache = response.contents || response
+    
+    const blogPosts = contentCache
+      .filter((item: any) => item._path?.startsWith('/blog/'))
+      .sort((a: any, b: any) => b._path.localeCompare(a._path))
+      .slice(0, 12)
     
     return blogPosts
   } catch (err) {

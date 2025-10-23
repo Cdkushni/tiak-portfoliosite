@@ -1,4 +1,6 @@
 import { serverQueryContent } from '#content/server'
+import fs from 'fs'
+import path from 'path'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -7,7 +9,12 @@ export default defineEventHandler(async (event) => {
     const connect = await import('~/content/setup/connect.json')
     
     // Get all pages from content/page/ directory
-    const pages = await serverQueryContent(event, 'page').find()
+    let pages = []
+    try {
+      pages = await serverQueryContent(event, 'page').find()
+    } catch (err) {
+      console.warn('Could not query pages from content API, using static menu')
+    }
     
     // Build menu from pages - start with Home
     const menu = [
@@ -17,27 +24,26 @@ export default defineEventHandler(async (event) => {
       }
     ]
     
-    // Add pages from content/page/ directory
-    // Sort by title alphabetically
-    const sortedPages = pages
-      .filter((page: any) => page.title) // Only include pages with titles
-      .sort((a: any, b: any) => (a.title || '').localeCompare(b.title || ''))
-    
-    for (const page of sortedPages) {
-      // Extract the slug from the path (e.g., /page/about -> /about)
-      const slug = page._path?.replace('/page', '') || ''
+    if (pages.length > 0) {
+      // Add pages from content/page/ directory
+      // Sort by title alphabetically
+      const sortedPages = pages
+        .filter((page: any) => page.title) // Only include pages with titles
+        .sort((a: any, b: any) => (a.title || '').localeCompare(b.title || ''))
       
-      menu.push({
-        name: page.title,
-        link: slug
-      })
+      for (const page of sortedPages) {
+        // Extract the slug from the path (e.g., /page/about -> /about)
+        const slug = page._path?.replace('/page', '') || ''
+        
+        menu.push({
+          name: page.title,
+          link: slug
+        })
+      }
+    } else if (info.default?.menu) {
+      // Fallback to manual menu from info.json if no pages found
+      menu.push(...info.default.menu.filter((item: any) => item.link !== '/'))
     }
-    
-    // Merge with any manually defined menu items from info.json
-    // This allows manual overrides or additional external links
-    const manualMenuItems = info.default?.menu?.filter((item: any) => 
-      item.link === '/' || !menu.some((autoItem: any) => autoItem.link === item.link)
-    ) || []
     
     return {
       info: {

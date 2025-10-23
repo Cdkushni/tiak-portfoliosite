@@ -161,11 +161,58 @@
 <script setup lang="ts">
 const siteStore = useSiteStore()
 
-// Fetch site data from API
+// Fetch site data - use different methods for dev vs production
 const { data: siteData } = await useAsyncData('site-data', async () => {
   try {
-    const data = await $fetch('/api/site-info')
-    return data
+    // In production (static), read from static JSON files
+    // In dev, use the API endpoint
+    if (process.dev) {
+      try {
+        const data = await $fetch('/api/site-info')
+        return data
+      } catch (err) {
+        // Fallback to static files if API fails
+        console.warn('API failed, falling back to static files')
+      }
+    }
+    
+    // Load static JSON files
+    const info = await $fetch('/content/setup/info.json')
+    const connect = await $fetch('/content/setup/connect.json')
+    
+    // Build menu from content cache in production
+    let menu = info?.menu || []
+    
+    // If in production, build menu from pages in content cache
+    if (!process.dev) {
+      try {
+        const contentCache = await $fetch('/content-cache.json')
+        const pages = (contentCache.contents || contentCache)
+          .filter((item: any) => item._path?.startsWith('/page/') && item.title)
+          .sort((a: any, b: any) => (a.title || '').localeCompare(b.title || ''))
+        
+        menu = [
+          { name: 'Home', link: '/' },
+          ...pages.map((page: any) => ({
+            name: page.title,
+            link: page._path.replace('/page', '')
+          }))
+        ]
+      } catch (err) {
+        console.warn('Could not build menu from cache, using manual menu')
+        menu = info?.menu || []
+      }
+    }
+    
+    return {
+      info: {
+        ...info,
+        menu: menu
+      },
+      connectLinks: connect?.connectlinks || [],
+      subcategories: [],
+      categories: []
+    }
   } catch (error) {
     console.error('Error fetching site data:', error)
     return {
