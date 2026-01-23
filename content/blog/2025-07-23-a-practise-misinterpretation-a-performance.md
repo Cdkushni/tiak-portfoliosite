@@ -6,9 +6,9 @@ subcategory: TOURING
 ---
 A tirade of sonic innuendo to pop culture, Bouffon about the escapism of being White passing, and ultimately grief through burnout, **a practise: Misinterpretation (a performance)** unveils the constant fight to be true to yourself even when being White might be the easiest option. 
 
-*C﻿reated by **Real Sweat Performance Group*** 
+\*C﻿reated by **Real Sweat Performance Group*** 
 
-***Real Sweat Performance Group** is a wildly sexy, bi-cross-mixed racial, queer, seductively provocative, overly energetic, underappreciated (underage) ad hoc performance collective co-created by dance artist Tia Ashley Kushniruk 亚 女弟 and theatre creator Philip Jonah Logan Geller. The collaborative relationship was forged in the fires of a bouffon workshop in 2023, the duo has been sweating ever since. Blurring the lines of traditional performance we tackle themes of racial oppression, white supremacy, collective existential angst and coffee enemas.* 
+**\*Real Sweat Performance Group** is a wildly sexy, bi-cross-mixed racial, queer, seductively provocative, overly energetic, underappreciated (underage) ad hoc performance collective co-created by dance artist Tia Ashley Kushniruk 亚 女弟 and theatre creator Philip Jonah Logan Geller. The collaborative relationship was forged in the fires of a bouffon workshop in 2023, the duo has been sweating ever since. Blurring the lines of traditional performance we tackle themes of racial oppression, white supremacy, collective existential angst and coffee enemas.* 
 
 **P﻿REMIERE**
 
@@ -16,7 +16,7 @@ A tirade of sonic innuendo to pop culture, Bouffon about the escapism of being W
 
 **U﻿PCOMING PERFORMANCES**
 
-2﻿026 - OFFTA Montreal PQ 
+2﻿026 - TBA
 
 **C﻿REDITS**
 
