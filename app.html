@@ -12,22 +12,10 @@ https://jake101.com | https://github.com/jake-101
 <html {{ HTML_ATTRS }}>                              
 <head>
   {{ HEAD }}
-  <script defer src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 
 <body {{ BODY_ATTRS }}>
   {{ APP }}
 </body>
-<script defer>
-  if (window.netlifyIdentity) {
-    window.netlifyIdentity.on("init", user => {
-      if (!user) {
-        window.netlifyIdentity.on("login", () => {
-          document.location.href = "/admin/";
-        });
-      }
-    });
-  }
-</script>
 
 </html>
